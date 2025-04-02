@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Notes Summarizer</title>
+    <style>
+        body {
+            background-color: #f0f0f0;
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-image: url("https://www.transparenttextures.com/patterns/cubes.png"),
+                linear-gradient(rgba(237, 128, 128, 0.8), rgba(142, 202, 215, 0.8));
+        }
+
+        main {
+            background-color: rgba(255, 255, 255, 0.5);
+            padding: 20px;
+            border-radius: 10px;
+            width: 90%;
+            height: 90vh;
+            margin: 20px auto;
+            display: flex;
+            flex-direction: column;
+            background-image: url("https://www.transparenttextures.com/patterns/cubes.png"),
+                linear-gradient(rgba(237, 128, 128, 0.8), rgba(142, 202, 215, 0.8));
+        }
+
+        h1 {
+            text-align: center;
+            color: #333;
+            margin-bottom: 20px;
+        }
+
+        .file-upload-buttons {
+            display: flex;
+            justify-content: space-between;
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+
+          /*
+        
+        */
+
+
+        .file-upload-button {
+    position: relative; /* Ensure the pseudo-element positions correctly */
+    padding: 12px;
+    background-color: #111411;
+    color: white;
+    border: none;
+    border-radius: 35px;
+    cursor: pointer;
+    text-align: center;
+    font-size: 1rem;
+    height: 70px;
+    width: 46%;
+    overflow: hidden; /* Clip the pseudo-element within the button */
+    transition: color 0.3s ease-in;
+}
+
+.file-upload-button::before {
+    content: '';
+    position: absolute;
+    top: 100%; /* Start below the button */
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: #ccc; /* The hover background color */
+    transition: top 0.3s ease-in;
+    z-index: 0; /* Place the pseudo-element below the text */
+}
+
+.file-upload-button:hover::before {
+    top: 0; /* Move the pseudo-element upwards to cover the button */
+}
+
+.file-upload-button:hover {
+    color: rgb(0, 0, 0); /* Change text color on hover */
+}
+
+.file-upload-button span {
+    position: relative;
+    z-index: 1; /* Ensure the text is above the pseudo-element */
+}
+
+
+        /*
+        
+        */
+        .file-input {
+            display: none;
+        }
+
+        .text-area-container {
+            display: flex;
+            gap: 20px;
+            flex: 1;
+        }
+
+        textarea {
+            width: 100%;
+            height: 100%;
+            resize: none;
+            padding: 5px;
+            font-size: 1rem;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+            box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.1);
+            white-space: pre-wrap;
+            word-wrap: break-word;
+            overflow-wrap: break-word;
+            background-image: url("https://www.transparenttextures.com/patterns/cubes.png"),
+                linear-gradient(rgba(215, 175, 175, 0.8), rgba(176, 203, 211, 0.8));
+        }
+
+        .text-area-container>div {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .text-area-container>div h3 {
+            margin-bottom: 10px;
+        }
+
+        .summarize-btn {
+            margin-top: 10px;
+            padding: 8px 12px;
+            background-color: #111411;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 1rem;
+            align-self: flex-start;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .summarize-btn:hover {
+            transform: scale(1.1);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            background-color: #1F7A8C;
+        }
+
+        .button-container {
+            display: flex;
+            gap: 10px;
+            margin-top: 10px;
+        }
+
+        .copy-btn,
+        .export-pdf-btn {
+            padding: 8px 12px;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 1rem;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .copy-btn {
+            background-color: #4CAF50;
+        }
+
+        .copy-btn:hover {
+            transform: scale(1.1);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            background-color: #45a049;
+        }
+
+        .export-pdf-btn {
+            background-color: #FF5722;
+        }
+
+        .export-pdf-btn:hover {
+            transform: scale(1.1);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            background-color: #E64A19;
+        }
+
+        .copy-message {
+            color: #28a745;
+            font-size: 0.9rem;
+            margin-top: 5px;
+            display: none;
+        }
+
+    </style>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.10.377/pdf.min.js"></script>
+</head>
+
+<body>
+    <main>
+        <h1>Welcome to Notes Summarizer!!</h1>
+
+        <div class="file-upload-buttons">
+            
+            <button class="file-upload-button" id="upload-pdf"><span><b>Upload PDF File</b></span></button>
+            <button class="file-upload-button" id="upload-txt"><span><b>Upload TXT File</b></span></button>
+            <input type="file" id="file-input-pdf" class="file-input" accept=".pdf">
+            <input type="file" id="file-input-txt" class="file-input" accept=".txt">
+        </div>
+
+        <div class="text-area-container">
+            <div>
+                <h3>File Content:</h3>
+                <textarea id="fileContent" readonly></textarea>
+                <div class="summarize-container">
+                    <button class="summarize-btn" id="summarize-btn">Summarize</button>
+                    
+                </div>
+            </div>
+            <div>
+                <h3>Summarized Output:</h3>
+                <textarea id="output" readonly></textarea>
+                <div class="button-container">
+                    <button class="copy-btn" id="copy-btn">Copy to Clipboard</button>
+                    <button class="export-pdf-btn" id="export-pdf-btn">Export to PDF</button>
+                </div>
+                <span class="copy-message" id="copy-message">Copied!</span>
+            </div>
+        </div>
+    </main>
+    <script>
+        const uploadPDFButton = document.getElementById('upload-pdf');
+        const uploadTXTButton = document.getElementById('upload-txt');
+        const fileInputPDF = document.getElementById('file-input-pdf');
+        const fileInputTXT = document.getElementById('file-input-txt');
+        const fileContentTextarea = document.getElementById('fileContent');
+        const outputTextarea = document.getElementById('output');
+        let uploadedFile = null;
+
+        uploadPDFButton.addEventListener('click', () => fileInputPDF.click());
+        uploadTXTButton.addEventListener('click', () => fileInputTXT.click());
+        fileInputPDF.addEventListener('change', (e) => handleFile(e.target.files[0]));
+        fileInputTXT.addEventListener('change', (e) => handleFile(e.target.files[0]));
+
+        function handleFile(file) {
+            uploadedFile = file;
+            if (file.type === 'application/pdf') {
+                fileContentTextarea.value = "PDF file loaded. Ready for summarization.";
+            } else if (file.type === 'text/plain') {
+                const reader = new FileReader();
+                reader.onload = (event) => fileContentTextarea.value = event.target.result;
+                reader.readAsText(file, 'UTF-8');
+            } else {
+                alert("Unsupported file format. Please upload a PDF or TXT file.");
+            }
+        }
+
+        document.getElementById('summarize-btn').addEventListener('click', async () => {
+            if (!uploadedFile) {
+                alert('Please upload a file first.');
+                return;
+            }
+            outputTextarea.value = 'Summarizing...';
+            const formData = new FormData();
+            formData.append('file', uploadedFile);
+
+            try {
+                const response = await fetch('http://127.0.0.1:5000/summarize', { method: 'POST', body: formData });
+                const data = await response.json();
+                outputTextarea.value = data.summary;
+            } catch (error) {
+                outputTextarea.value = 'Error processing the file.';
+            }
+        });
+
+        document.getElementById('copy-btn').addEventListener('click', () => {
+            navigator.clipboard.writeText(outputTextarea.value)
+                .then(() => {
+                    const copyMessage = document.getElementById('copy-message');
+                    copyMessage.style.display = 'inline';
+                    setTimeout(() => copyMessage.style.display = 'none', 2000);
+                });
+        });
+
+        document.getElementById('export-pdf-btn').addEventListener('click', () => {
+            const doc = new jspdf.jsPDF();
+            doc.text(outputTextarea.value, 10, 10);
+            doc.save('summarized_output.pdf');
+        });
+    </script>
+</body>
+
+</html>
