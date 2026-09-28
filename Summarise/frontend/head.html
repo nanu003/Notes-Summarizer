@@ -266,9 +266,12 @@
             try {
                 const response = await fetch('http://127.0.0.1:5000/summarize', { method: 'POST', body: formData });
                 const data = await response.json();
+                if (!response.ok) {
+                    throw new Error(data.details || data.error || 'The server could not summarize the file.');
+                }
                 outputTextarea.value = data.summary;
             } catch (error) {
-                outputTextarea.value = 'Error processing the file.';
+                outputTextarea.value = `Error: ${error.message}`;
             }
         });
 

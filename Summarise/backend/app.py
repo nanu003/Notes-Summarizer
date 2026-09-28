@@ -1,7 +1,8 @@
 import logging
+import os
 import traceback
 import markdown
-from flask import Flask, request, jsonify  # Web app + handle HTTP requests
+from flask import Flask, request, jsonify, send_from_directory  # Web app + handle HTTP requests
 from openai import OpenAI  # To communicate with NVIDIA LLM API
 from flask_cors import CORS  # Cross-origin requests
 import pdfplumber  # Library to extract text from PDF
@@ -16,7 +17,12 @@ CORS(app) #cross orgin resource sharing
 
 # Configure NVIDIA's LLM API
 NVIDIA_API_BASE_URL = "https://integrate.api.nvidia.com/v1"
-API_KEY = "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"  # Replace with your NVIDIA API key
+API_KEY = "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"  # Replace with your NVIDIA API key
+
+
+@app.route("/", methods=["GET"])
+def serve_frontend():
+    return send_from_directory(os.path.join(os.path.dirname(__file__), "..", "frontend"), "head.html")
 
 
 # Route for uploading a file and summarizing its content
@@ -75,7 +81,7 @@ def summarize_file():
         logging.debug("Calling NVIDIA's API")
         try:
             completion = client.chat.completions.create(
-                model="nvidia/llama-3.1-nemotron-70b-instruct",
+               model="meta/llama-3.2-11b-vision-instruct",
                 messages=[
                     {"role": "system", "content": "summarize this"},
                     {"role": "user", "content": text_data}
