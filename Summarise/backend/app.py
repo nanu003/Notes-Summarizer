@@ -81,7 +81,7 @@ def summarize_file():
         logging.debug("Calling NVIDIA's API")
         try:
             completion = client.chat.completions.create(
-               model="meta/llama-3.2-11b-vision-instruct",
+               model="meta/llama-3.1-70b-instruct",
                 messages=[
                     {"role": "system", "content": "summarize this"},
                     {"role": "user", "content": text_data}
